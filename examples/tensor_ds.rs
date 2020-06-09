@@ -1,4 +1,6 @@
-use dlpipeline::{dataloader::DataLoaderBuilder, dataset::BatchDataset};
+use dlpipeline::{
+    dataloader::DataLoader, dataloader_options::DataLoaderOptions, dataset::BatchDataset,
+};
 use tch::{kind::FLOAT_CPU, Tensor};
 
 #[derive(Debug)]
@@ -7,8 +9,8 @@ pub struct TensorListDataset {
 }
 
 impl TensorListDataset {
-    pub fn new() -> TensorListDataset {
-        let samples: Vec<Tensor> = (0..100)
+    pub fn new(size: Option<usize>) -> TensorListDataset {
+        let samples: Vec<Tensor> = (0..size.unwrap_or(100))
             .map(|_i| Tensor::rand(&[2, 3, 16, 16], FLOAT_CPU))
             .collect();
 
@@ -29,11 +31,7 @@ impl BatchDataset for TensorListDataset {
 }
 
 fn main() {
-    let tensor_list_ds = TensorListDataset::new();
+    let tensor_list_ds = TensorListDataset::new(None);
 
     // println!("{:?}", tensor_list_ds);
-
-    let loader = DataLoaderBuilder::new(tensor_list_ds)
-        .batch_size(16)
-        .build();
 }

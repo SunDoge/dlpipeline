@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-pub struct DataLoaderOptions {
+pub struct DataLoaderOptionsBuilder {
     pub batch_size: usize,
     pub num_workers: usize,
     pub enforce_ordering: bool,
@@ -9,9 +9,9 @@ pub struct DataLoaderOptions {
     pub drop_last: bool,
 }
 
-impl Default for DataLoaderOptions {
+impl Default for DataLoaderOptionsBuilder {
     fn default() -> Self {
-        DataLoaderOptions {
+        DataLoaderOptionsBuilder {
             batch_size: 1,
             num_workers: 0,
             enforce_ordering: true,
@@ -22,7 +22,25 @@ impl Default for DataLoaderOptions {
     }
 }
 
-pub struct FullDataLoaderOptions {
+impl DataLoaderOptionsBuilder {
+    pub fn batch_size<'a>(&'a mut self, bs: usize) -> &'a mut Self {
+        self.batch_size = bs;
+        self
+    }
+
+    pub fn num_workers<'a>(&'a mut self, n: usize) -> &'a mut Self {
+        self.num_workers = n;
+        self
+    }
+
+    // TODO: more functions
+
+    pub fn build(&self) -> DataLoaderOptions {
+        DataLoaderOptions::from(self)
+    }
+}
+
+pub struct DataLoaderOptions {
     pub batch_size: usize,
     pub num_workers: usize,
     pub enforce_ordering: bool,
@@ -31,9 +49,9 @@ pub struct FullDataLoaderOptions {
     pub drop_last: bool,
 }
 
-impl From<DataLoaderOptions> for FullDataLoaderOptions {
-    fn from(options: DataLoaderOptions) -> FullDataLoaderOptions {
-        FullDataLoaderOptions {
+impl From<&DataLoaderOptionsBuilder> for DataLoaderOptions {
+    fn from(options: &DataLoaderOptionsBuilder) -> DataLoaderOptions {
+        DataLoaderOptions {
             batch_size: options.batch_size,
             num_workers: options.num_workers,
             max_jobs: options.max_jobs.unwrap_or(options.num_workers * 2),

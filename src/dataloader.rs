@@ -1,73 +1,28 @@
+use super::dataloader_options::DataLoaderOptions;
 use super::dataset::BatchDataset;
+use super::samplers::base::Sampler;
+use std::sync::Arc;
 
-
-
-pub struct DataLoader<T>
+pub struct DataLoader<D, S>
 where
-    T: BatchDataset,
+    D: BatchDataset,
+    S: Sampler,
 {
-    dataset: T,
-    batch_size: usize,
-    num_workers: usize,
-    shuffle: bool,
-    order: bool,
+    options: DataLoaderOptions,
+    dataset: Arc<D>,
+    sampler: S,
 }
 
-impl<T> DataLoader<T> where T: BatchDataset {}
-
-
-pub struct DataLoaderBuilder<T>
+impl<D, S> DataLoader<D, S>
 where
-    T: BatchDataset,
+    D: BatchDataset,
+    S: Sampler,
 {
-    dataset: T,
-    batch_size: usize,
-    num_workers: usize,
-    shuffle: bool,
-    order: bool,
-}
-
-impl<T> DataLoaderBuilder<T>
-where
-    T: BatchDataset,
-{
-    pub fn new(dataset: T) -> Self {
-        DataLoaderBuilder {
-            dataset,
-            batch_size: 1,
-            num_workers: 0,
-            shuffle: false,
-            order: false,
-        }
-    }
-
-    pub fn batch_size(mut self, bs: usize) -> Self {
-        self.batch_size = bs;
-        self
-    }
-
-    pub fn num_workers(mut self, n: usize) -> Self {
-        self.num_workers = n;
-        self
-    }
-
-    pub fn shuffle(mut self, shuffle: bool) ->Self {
-        self.shuffle = shuffle;
-        self
-    }
-
-    pub fn order(mut self, order: bool) -> Self {
-        self.order = order;
-        self
-    }
-
-    pub fn build(self) -> DataLoader<T> {
+    pub fn new(dataset: D, sampler: S, options: DataLoaderOptions) -> Self {
         DataLoader {
-            dataset: self.dataset,
-            batch_size: self.batch_size,
-            num_workers: self.num_workers,
-            shuffle: self.shuffle,
-            order: self.order,
+            dataset: Arc::new(dataset),
+            sampler,
+            options,
         }
     }
 }
