@@ -1,4 +1,4 @@
-use dlpipeline::{data_loader::DataLoaderBuilder, dataset::BatchDataset};
+use dlpipeline::{dataloader::DataLoaderBuilder, dataset::BatchDataset};
 use tch::{kind::FLOAT_CPU, Tensor};
 
 #[derive(Debug)]
